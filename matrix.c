@@ -1,45 +1,77 @@
-#include <stdio.h>
+﻿#include <stdio.h>
 #include <stdlib.h>
 
 void main()
 {
-	int i,j,k,l,m,n,o;
+	int i,j;
 	int dimension;
-	int flag;//标志代数余子式的符号
-	double deterValue;
-	double **array,**companionMatrix,*temp;
+	double deterValue=1;
+	double **array,**deterArray, **companionMatrix, *temp;
 	
 	//声明函数
 	void printfDouble2Dimension(int s, int n, double **array);
 	double deter(int dimension, double **array);
+	void copyDouble2Dimension(int s, int n, double **source, double **dest);
+	void getCompanionMatrix(int dimension, double **array, double **companionMatrix);
 
 	printf("请输入方阵的阶数N:");
 	scanf("%d",&dimension);
 
 	array=(double**)malloc(dimension*sizeof(double*));
-	companionMatrix =(double**)malloc((dimension-1)*sizeof(double*));
+	deterArray=(double**)malloc(dimension*sizeof(double*));
+	companionMatrix =(double**)malloc(dimension*sizeof(double*));
+	
 	//循环输入方阵
 	for(i=0;i<dimension;i++)
 	{
 		temp=(double*)malloc(dimension*sizeof(double));
-		printf("请输入方阵的第%d行",i+1);
+		deterArray[i]=(double*)malloc(dimension*sizeof(double));
+		companionMatrix[i]=(double*)malloc(dimension*sizeof(double));
+
+		printf("请输入方阵的第%d行:",i+1);
 		for(j=0;j<dimension;j++)
 			scanf("%lf",temp+j);
 		array[i]=temp;
 	}
+	//拷贝数组
+	copyDouble2Dimension(dimension,dimension,array,deterArray);
+
 	//打印方阵
-	printf("方阵如下:\n");
-	printfDouble2Dimension(dimension,dimension,array);
+	printf("方阵初等变换之前如下:\n");
+	printfDouble2Dimension(dimension,dimension,array);	
+	deterValue = deter(dimension,deterArray);
 	
-	deterValue = deter(dimension,array);
+	printf("方阵初等变换之后如下:\n");
+	printfDouble2Dimension(dimension,dimension,deterArray);
+
 	if(deterValue==0)
 	{
 		printf("方阵行列式值为零.\n");
+		system("pause");
 		return ;
 	}		
-	printf("行列式的值:%lf",deterValue);
-	
+	printf("行列式的值:%.2lf\n",deterValue);
 	//求伴随矩阵
+	getCompanionMatrix(dimension,array,companionMatrix);
+
+	//打印伴随矩阵
+	printf("伴随矩阵如下:\n");
+	printfDouble2Dimension(dimension, dimension, companionMatrix);
+	system("pause");
+}
+
+//求伴随矩阵
+void getCompanionMatrix(int dimension, double **array, double **companionMatrix)
+{
+	int i,j,k,l,m,n,o;
+	int flag;//标志代数余子式的符号
+	double **companionTemp, *temp;
+	double deter(int dimension,double **array);
+
+	companionTemp =(double**)malloc((dimension-1)*sizeof(double*));
+	for(i=0;i<dimension-1;i++)
+		companionTemp[i]=(double*)malloc((dimension-1)*sizeof(double));
+
 	for(i=0;i<dimension;i++)
 	{
 		for(j=0;j<dimension;j++)
@@ -47,20 +79,21 @@ void main()
 			flag=(i+j)%2==0?1:-1;
 			for(k=0,m=0;k<dimension;k++)
 			{
-				if(k==i)continue;
-	                        temp=(double*)malloc((dimension-1)*sizeof(double));
+				if(k==i)continue;				
+				temp=(double*)malloc((dimension-1)*sizeof(double));
 
 				for(l=0,n=0;l<dimension;l++)
 				{
 					if(l==j)continue;
 					*(temp+n)=*(*(array+k)+l);
-					n++;	
+					n++;	 
 				}
 				for(o=0;o<dimension-1;o++)
-					*(*(companionMatrix+o)+m)=*(temp+m);	
+					*(*(companionTemp+o)+m)=*(temp+o);	
 				m++;
 			}
-			printfDouble2Dimension(dimension-1,dimension-1,companionMatrix);
+			//printfDouble2Dimension(dimension-1,dimension-1,companionTemp);
+			*(*(companionMatrix+i)+j) = flag * deter(dimension-1,companionTemp);
 		}
 	}
 }
@@ -129,5 +162,18 @@ void printfDouble2Dimension(int s, int n, double **array)
 			printf("%6.2lf",*(*(array+i)+j));	
 		}
 		printf("\n");
+	}
+}
+
+//拷贝数组
+void copyDouble2Dimension(int s, int n, double **source, double **dest)
+{
+	int i,j;
+	for(i=0;i<s;i++)
+	{
+		for(j=0;j<n;j++)
+		{
+			*(*(dest+i)+j)=*(*(source+i)+j);
+		}
 	}
 }
