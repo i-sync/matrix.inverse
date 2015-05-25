@@ -110,18 +110,18 @@ double deter(int dimension,double **array)
 	for(i=0,j;i<dimension-1;i++)
 	{
 		j=i;
-		if(array[i][j]==0)
+		if(*(*(array+i)+j)==0)
 		{
 			b=0;
 			for(k=i+1;k<dimension;k++)
 			{
-				if(array[k][j]!=0)//找到一行不为0的,然后换行 
+				if(*(*(array+k)+j)!=0)//找到一行不为0的,然后换行 
 				{
 					for(l=j;l<dimension;l++)
 					{
-						temp=array[k][l];
-						array[k][l]=array[i][l];
-						array[i][l]=temp;
+						temp=*(*(array+k)+l);
+						*(*(array+k)+l)= *(*(array+i)+l);
+						*(*(array+i)+l)=temp;
 					}
 					flag*=-1;
 					b=1;
@@ -137,16 +137,16 @@ double deter(int dimension,double **array)
 		}
 		for(;j<dimension-1;j++)
 		{
-			if(array[j+1][i]==0) 
+			if(*(*(array+j+1)+i)==0) 
 				continue;
-			temp = -array[j+1][i]/array[i][i];
+			temp = -*(*(array+j+1)+i)/ *(*(array+i)+i);
 			for(k=i;k<dimension;k++)
-				array[j+1][k]+=array[i][k]*temp;
+				*(*(array+j+1)+k)+= *(*(array+i)+k)*temp;
 		}
 	}
 	
 	for(i=0;i<dimension;i++)
-		sum*=array[i][i];
+		sum*= *(*(array+i)+i);
 	return sum*flag;
 }
 
