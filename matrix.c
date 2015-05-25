@@ -65,7 +65,7 @@ void getCompanionMatrix(int dimension, double **array, double **companionMatrix)
 {
 	int i,j,k,l,m,n,o;
 	int flag;//标志代数余子式的符号
-	double **companionTemp, *temp;
+	double **companionTemp;
 	double deter(int dimension,double **array);
 
 	companionTemp =(double**)malloc((dimension-1)*sizeof(double*));
@@ -79,21 +79,17 @@ void getCompanionMatrix(int dimension, double **array, double **companionMatrix)
 			flag=(i+j)%2==0?1:-1;
 			for(k=0,m=0;k<dimension;k++)
 			{
-				if(k==i)continue;				
-				temp=(double*)malloc((dimension-1)*sizeof(double));
-
+				if(k==i)continue;		
 				for(l=0,n=0;l<dimension;l++)
 				{
 					if(l==j)continue;
-					*(temp+n)=*(*(array+k)+l);
+					*(*(companionTemp+m)+n) = *(*(array+k)+l);
 					n++;	 
 				}
-				for(o=0;o<dimension-1;o++)
-					*(*(companionTemp+o)+m)=*(temp+o);	
 				m++;
 			}
-			//printfDouble2Dimension(dimension-1,dimension-1,companionTemp);
-			*(*(companionMatrix+i)+j) = flag * deter(dimension-1,companionTemp);
+			//第i行，第j列的代数余子式 赋值给第j行，第i列
+			*(*(companionMatrix+j)+i) = flag * deter(dimension-1,companionTemp);
 		}
 	}
 }
